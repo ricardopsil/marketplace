@@ -1,0 +1,240 @@
+﻿<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <title>Bonsai — Publicar</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,400,0,0" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <header class="bonsai-hero">
+        <div class="container bonsai-hero-inner d-flex align-items-center justify-content-between">
+            <div class="d-flex gap-3 align-items-center logo-area">
+                <img src="bonsai logo.jpg" alt="logo" class="bonsai-logo-img">
+                <div>
+                    <h1 class="bonsai-title mb-0">Nova Publicação</h1>
+                </div>
+            </div>
+            <a href="index.html" class="btn btn-outline-secondary btn-sm">Voltar</a>
+        </div>
+    </header>
+
+    <main class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Seletor de Tipo de Publicação -->
+                <div class="mb-5 text-center">
+                    <h3 class="fw-bold">O que você deseja publicar?</h3>
+                    <p class="text-muted">Selecione o tipo para começar.</p>
+                    <div class="d-flex justify-content-center gap-3 mt-4" id="typeSelector">
+                        <button class="type-card" data-type="produto">
+                            <span class="material-symbols-rounded">inventory_2</span>
+                            <span class="fw-bold">Produto</span>
+                            <small>Venda um item físico</small>
+                        </button>
+                        <button class="type-card" data-type="servico">
+                            <span class="material-symbols-rounded">construction</span>
+                            <span class="fw-bold">Serviço</span>
+                            <small>Ofereça suas habilidades</small>
+                        </button>
+                        <button class="type-card" data-type="leilao">
+                            <span class="material-symbols-rounded">gavel</span>
+                            <span class="fw-bold">Leilão</span>
+                            <small>Comece com um lance inicial</small>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Formulário Dinâmico -->
+                <form id="formPublicacao" class="d-none">
+                    <h4 class="fw-bold mb-4 border-bottom pb-3" id="formTitle"></h4>
+
+                    <!-- Campos Comuns -->
+                    <div class="mb-4">
+                        <label for="titulo" class="form-label fw-bold">Título *</label>
+                        <input type="text" id="titulo" class="form-control form-control-lg" required>
+                        <div class="form-text">Seja claro e descritivo. Ex: "Câmera Sony A7 III semi-nova"</div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="descricao" class="form-label fw-bold">Descrição *</label>
+                        <textarea id="descricao" class="form-control" rows="5" required></textarea>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label for="categoria" class="form-label fw-bold">Categoria *</label>
+                            <select id="categoria" class="form-select" required></select>
+                        </div>
+                        <div class="col-md-6" id="locationField">
+                            <label for="localizacao" class="form-label fw-bold">Localização</label>
+                            <input type="text" id="localizacao" class="form-control" placeholder="Ex: São Paulo, SP">
+                        </div>
+                    </div>
+
+                    <!-- Campos Específicos -->
+                    <div id="specificFields"></div>
+
+                    <!-- Mídia -->
+                    <div class="mb-4">
+                        <h5 class="fw-bold mb-3">Mídia</h5>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Imagens (até 5)</label>
+                                <div id="uploadAreaImagens" class="upload-area">
+                                    <span class="material-symbols-rounded">add_photo_alternate</span>
+                                    <span>Clique ou arraste imagens</span>
+                                    <input type="file" id="inputImagens" accept="image/*" multiple hidden>
+                                </div>
+                                <div id="previewImagens" class="d-flex gap-2 mt-2 flex-wrap"></div>
+                            </div>
+                            <div class="col-md-6" id="videoUploadContainer">
+                                <label class="form-label">Vídeo (opcional, máx 15s)</label>
+                                <div id="uploadAreaVideo" class="upload-area">
+                                    <span class="material-symbols-rounded">videocam</span>
+                                    <span>Clique ou arraste um vídeo</span>
+                                    <input type="file" id="inputVideo" accept="video/mp4,video/quicktime" hidden>
+                                </div>
+                                <div id="previewVideo" class="mt-2"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 mt-5">
+                        <button type="button" class="btn btn-light border" onclick="resetForm()">Cancelar</button>
+                        <button type="submit" class="btn btn-primary px-4">Publicar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="script.js"></script> <!-- Reutiliza o script principal -->
+    <script>
+        // Lógica específica da página de publicação
+        document.addEventListener('DOMContentLoaded', () => {
+            const typeSelector = document.getElementById('typeSelector');
+            const form = document.getElementById('formPublicacao');
+
+            let selectedType = null;
+            const urlParams = new URLSearchParams(window.location.search);
+            const initialType = urlParams.get('tipo');
+
+            const initForm = (type) => {
+                selectedType = type;
+                typeSelector.classList.add('d-none');
+                form.classList.remove('d-none');
+
+                const titleMap = {
+                    produto: 'Anunciar novo Produto',
+                    servico: 'Oferecer novo Serviço',
+                    leilao: 'Criar novo Leilão',
+                };
+                document.getElementById('formTitle').innerText = titleMap[type];
+
+                // Preencher categorias
+                const catSelect = document.getElementById('categoria');
+                catSelect.innerHTML = categorias.map(c => `<option value="${c.id}">${c.label}</option>`).join('');
+
+                // Renderizar campos específicos
+                const specificFields = document.getElementById('specificFields');
+                const videoContainer = document.getElementById('videoUploadContainer');
+
+                let fieldsHTML = '';
+                if (type === 'produto' || type === 'leilao') {
+                    fieldsHTML = `
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label for="preco" class="form-label fw-bold">${type === 'leilao' ? 'Lance Inicial' : 'Preço'} *</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">R$</span>
+                                        <input type="number" id="preco" class="form-control" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="condicao" class="form-label fw-bold">Condição *</label>
+                                    <select id="condicao" class="form-select" required>
+                                        <option value="novo">Novo</option>
+                                        <option value="usado">Usado - Como novo</option>
+                                        <option value="usado-marcas">Usado - Com marcas</option>
+                                    </select>
+                                </div>
+                            </div>
+                        `;
+                } else if (type === 'servico') {
+                    fieldsHTML = `
+                             <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label for="preco" class="form-label fw-bold">Preço (opcional)</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">R$</span>
+                                        <input type="number" id="preco" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="preco_tipo" class="form-label fw-bold">Modalidade</label>
+                                    <select id="preco_tipo" class="form-select">
+                                        <option>Por hora</option>
+                                        <option>Por projeto</option>
+                                        <option>A combinar</option>
+                                    </select>
+                                </div>
+                            </div>
+                        `;
+                }
+                specificFields.innerHTML = fieldsHTML;
+                videoContainer.classList.toggle('d-none', type === 'servico');
+            };
+
+            // Event listeners
+            typeSelector.querySelectorAll('.type-card').forEach(card => {
+                card.addEventListener('click', () => initForm(card.dataset.type));
+            });
+
+            if (initialType) {
+                initForm(initialType);
+            }
+
+            window.resetForm = () => {
+                form.classList.add('d-none');
+                typeSelector.classList.remove('d-none');
+                form.reset();
+            };
+
+            // UIs de Upload
+            setupUploadArea('uploadAreaImagens', 'inputImagens', 'previewImagens', true);
+            setupUploadArea('uploadAreaVideo', 'inputVideo', 'previewVideo', false);
+        });
+
+        function setupUploadArea(areaId, inputId, previewId, multiple) {
+            const area = document.getElementById(areaId);
+            const input = document.getElementById(inputId);
+            const preview = document.getElementById(previewId);
+
+            area.addEventListener('click', () => input.click());
+            input.addEventListener('change', (e) => {
+                if (!multiple) preview.innerHTML = '';
+                const files = Array.from(e.target.files);
+
+                files.forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        const div = document.createElement('div');
+                        div.className = 'preview-item';
+                        if (file.type.startsWith('image/')) {
+                            div.innerHTML = `<img src="${event.target.result}">`;
+                        } else if (file.type.startsWith('video/')) {
+                            div.innerHTML = `<video src="${event.target.result}" muted loop playsinline></video><span>${file.name}</span>`;
+                        }
+                        preview.appendChild(div);
+                    };
+                    reader.readAsDataURL(file);
+                });
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,340 @@
+﻿<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <title>Bonsai — Marketplace</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,400,0,0" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+    <header class="bonsai-hero">
+        <div class="container bonsai-hero-inner d-flex align-items-center justify-content-between">
+            <div class="d-flex gap-3 align-items-center logo-area">
+                <img src="bonsai logo.jpg" alt="logo" class="bonsai-logo-img">
+                <div>
+                    <h1 class="bonsai-title mb-0">Bonsai</h1>
+                    <div class="bonsai-subtitle small text-muted">Marketplace</div>
+                </div>
+            </div>
+
+            <div class="d-flex align-items-center gap-3">
+
+                <div class="hub-trigger-group d-none d-md-flex align-items-center">
+                    <button class="hub-btn" onclick="Hub.open('avisos')" title="Avisos">
+                        <span class="material-symbols-rounded">notifications</span>
+                        <span id="badgeAvisos" class="badge-dot d-none"></span>
+                    </button>
+                    <button class="hub-btn" onclick="Hub.open('chat')" title="Mensagens">
+                        <span class="material-symbols-rounded">forum</span>
+                        <span id="badgeChat" class="badge-dot d-none"></span>
+                    </button>
+                    <button class="hub-btn" onclick="Hub.open('negociacoes')" title="Minhas Negociações">
+                        <span class="material-symbols-rounded">shopping_bag</span>
+                        <span id="badgeNegociacoes" class="badge-dot d-none"></span>
+                    </button>
+                </div>
+
+                <button class="hub-btn d-md-none" onclick="Hub.open('chat')">
+                    <span class="material-symbols-rounded">dashboard</span>
+                    <span id="badgeHubMobile" class="badge-dot d-none"></span>
+                </button>
+
+                <div class="vr mx-1"></div>
+
+                <div class="dropdown">
+                    <button class="btn btn-primary btn-sm d-flex align-items-center gap-2 shadow-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="material-symbols-rounded" style="font-size:18px">add</span> <span class="d-none d-sm-inline">Anunciar</span>
+                    </button>
+                    <ul class="dropdown-menu shadow-sm border-0 mt-2 rounded-4 overflow-hidden">
+                        <li><a class="dropdown-item py-2 d-flex gap-2 align-items-center" href="criar-anuncio.html"><span class="material-symbols-rounded text-primary">sell</span> Criar Anúncio</a></li>
+                        <li><a class="dropdown-item py-2 d-flex gap-2 align-items-center" href="oferecer-servico.html"><span class="material-symbols-rounded text-success">handyman</span> Oferecer Serviço</a></li>
+                        <li><a class="dropdown-item py-2 d-flex gap-2 align-items-center" href="#"><span class="material-symbols-rounded text-warning">gavel</span> Criar Leilão</a></li>
+                    </ul>
+                </div>
+
+                <button class="avatar-btn" onclick="Hub.open('perfil')" title="Meu Perfil">
+                    <img id="headerAvatar" src="" alt="Avatar">
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <section class="bonsai-toolbar sticky-top">
+        <div class="container py-3">
+            <div class="row g-3 align-items-center">
+                <div class="col-auto">
+                    <div class="nav nav-pills bonsai-pills" id="grupoTipos">
+                        <button class="nav-link active" data-id="todos">Todos</button>
+                        <button class="nav-link" data-id="leiloes">Leilões</button>
+                        <button class="nav-link" data-id="servicos">Serviços</button>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="search-wrapper">
+                        <span class="material-symbols-rounded search-icon">search</span>
+                        <input id="inputBusca" type="text" class="form-control search-input" placeholder="Buscar...">
+                    </div>
+                </div>
+
+                <div class="col-auto">
+                    <button class="btn btn-light border btn-icon-text" data-bs-toggle="offcanvas" data-bs-target="#filtersOffcanvas">
+                        <span class="material-symbols-rounded">tune</span>
+                        <span class="d-none d-md-inline">Filtros</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="categories-scroll mt-3" id="listaCategoriasHorizontal">
+            </div>
+
+            <div id="subCategoriesContainer" class="subcategories-wrapper d-none">
+                <div class="categories-scroll small-scroll" id="listaSubCategorias">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <main class="container my-4 pb-5">
+        <div class="d-flex justify-content-between align-items-end mb-4">
+            <div>
+                <h4 class="fw-bold mb-1" id="sectionTitle">Explorar</h4>
+                <small class="text-muted">Encontre itens únicos e serviços especializados</small>
+            </div>
+            <div id="statsBar" class="small text-muted"></div>
+        </div>
+
+        <div class="bonsai-grid" id="listaAnuncios">
+        </div>
+
+        <div id="noResults" class="empty-state d-none">
+            <img src="https://cdn-icons-png.flaticon.com/512/4076/4076432.png" width="64" class="opacity-25 mb-3">
+            <p class="text-muted">Nenhum resultado encontrado para sua busca.</p>
+            <button class="btn btn-outline-primary btn-sm" onclick="limparFiltros()">Limpar filtros</button>
+        </div>
+
+        <div class="text-center mt-5">
+            <button id="btnCarregarMais" class="btn btn-light border px-4 py-2 fw-medium d-none">Carregar mais anúncios</button>
+        </div>
+    </main>
+
+    <div id="bonsaiHub" class="hub-overlay d-none">
+        <div class="hub-container shadow-lg">
+            <aside class="hub-dock">
+                <div class="dock-top">
+                    <button class="dock-item active" data-view="chat" onclick="Hub.switchView('chat')" title="Mensagens">
+                        <span class="material-symbols-rounded">chat_bubble</span>
+                        <span class="dock-label">Chat</span>
+                    </button>
+                    <button class="dock-item" data-view="negociacoes" onclick="Hub.switchView('negociacoes')" title="Negociações">
+                        <span class="material-symbols-rounded">handshake</span>
+                        <span class="dock-label">Negócios</span>
+                    </button>
+                    <button class="dock-item" data-view="avisos" onclick="Hub.switchView('avisos')" title="Avisos">
+                        <span class="material-symbols-rounded">notifications_active</span>
+                        <span class="dock-label">Avisos</span>
+                    </button>
+                </div>
+                <div class="dock-bottom">
+                    <button class="dock-item" data-view="perfil" onclick="Hub.switchView('perfil')" title="Perfil">
+                        <img id="hubAvatar" src="" class="dock-avatar">
+                    </button>
+                    <button class="dock-item logout" onclick="Hub.close()">
+                        <span class="material-symbols-rounded">close</span>
+                    </button>
+                </div>
+            </aside>
+
+            <div class="hub-content">
+
+                <div id="view-chat" class="hub-view d-none">
+                    <div class="chat-layout">
+                        <div class="chat-list">
+                            <div class="p-3 border-bottom">
+                                <h5 class="fw-bold mb-3">Mensagens</h5>
+                                <input type="text" class="form-control form-control-sm bg-light border-0" placeholder="Buscar conversa...">
+                            </div>
+                            <div class="chat-items-scroll" id="chatListContainer"></div>
+                        </div>
+                        <div class="chat-stage">
+                            <div id="chatEmptyState" class="h-100 d-flex flex-column align-items-center justify-content-center text-muted opacity-50">
+                                <span class="material-symbols-rounded display-4">forum</span>
+                                <p class="mt-2">Selecione uma conversa</p>
+                            </div>
+                            <div id="chatActive" class="d-none h-100 flex-column">
+                                <div class="chat-header border-bottom p-3 d-flex justify-content-between align-items-center bg-white">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <button class="btn btn-icon btn-sm d-md-none" onclick="Hub.mobileBackToChatList()"><span class="material-symbols-rounded">arrow_back</span></button>
+                                        <img id="chatHeaderImg" src="" class="rounded-circle" width="40" height="40">
+                                        <div>
+                                            <div id="chatHeaderName" class="fw-bold text-dark">Nome</div>
+                                            <div id="chatHeaderSubject" class="small text-muted">Assunto</div>
+                                        </div>
+                                    </div>
+                                    <div class="dropdown">
+                                        <button class="btn btn-icon" data-bs-toggle="dropdown"><span class="material-symbols-rounded">more_vert</span></button>
+                                        <ul class="dropdown-menu dropdown-menu-end">
+                                            <li><a class="dropdown-item text-danger" href="#">Denunciar</a></li>
+                                            <li><a class="dropdown-item" href="#">Arquivar</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div id="chatMessages" class="chat-body p-4 flex-grow-1"></div>
+                                <div class="chat-footer p-3 border-top bg-white">
+                                    <div class="d-flex gap-2 mb-2 overflow-auto quick-actions">
+                                        <button class="badge-btn" onclick="alert('Proposta enviada!')">💰 Fazer Proposta</button>
+                                        <button class="badge-btn" onclick="alert('Visita agendada!')">📅 Agendar Visita</button>
+                                        <button class="badge-btn" onclick="alert('Mais fotos solicitadas!')">📷 Pedir Fotos</button>
+                                    </div>
+                                    <div class="input-group">
+                                        <button class="btn btn-light border"><span class="material-symbols-rounded">add_circle</span></button>
+                                        <input id="chatInput" type="text" class="form-control border-start-0 border-end-0" placeholder="Digite sua mensagem...">
+                                        <button id="chatSendBtn" class="btn btn-primary"><span class="material-symbols-rounded">send</span></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="view-negociacoes" class="hub-view d-none p-4 bg-light-subtle">
+                    <h4 class="fw-bold mb-4">Minhas Negociações</h4>
+                    <div class="row g-4" id="negociacoesGrid"></div>
+                </div>
+
+                <div id="view-avisos" class="hub-view d-none p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="fw-bold m-0">Central de Avisos</h4>
+                        <button class="btn btn-link text-decoration-none btn-sm" onclick="Hub.markAllRead()">Marcar tudo como lido</button>
+                    </div>
+                    <div class="avisos-list" id="avisosList"></div>
+                </div>
+
+                <div id="view-perfil" class="hub-view d-none p-5">
+                    <div class="text-center mb-5">
+                        <img id="profileViewImg" src="" class="rounded-circle shadow-sm mb-3" width="100" height="100">
+                        <h3 id="profileViewName" class="fw-bold">Nome do Usuário</h3>
+                        <p id="profileViewEmail" class="text-muted">email@usuario.com</p>
+                    </div>
+                    <div class="row justify-content-center">
+                        <div class="col-md-8">
+                            <div class="card border-0 shadow-sm mb-4">
+                                <div class="card-body p-4">
+                                    <h6 class="fw-bold text-uppercase text-muted small mb-3">Preferências</h6>
+                                    <div class="form-check form-switch mb-3">
+                                        <input class="form-check-input" type="checkbox" id="prefHubSons" checked>
+                                        <label class="form-check-label" for="prefHubSons">Efeitos Sonoros no Hub</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="btn btn-outline-danger w-100 py-2">Sair da Conta</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="filtersOffcanvas">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title fw-bold">Filtros Avançados</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+        </div>
+        <div class="offcanvas-body">
+            <div class="card bg-light border-0 p-3 mb-4">
+                <div class="form-check form-switch m-0">
+                    <input class="form-check-input" type="checkbox" role="switch" id="switchPromovidos" checked>
+                    <label class="form-check-label fw-bold text-dark" for="switchPromovidos">Exibir Anúncios Promovidos</label>
+                </div>
+                <small class="text-muted mt-1 d-block">Itens em destaque aparecem primeiro.</small>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label fw-bold small text-uppercase">Preço</label>
+                <div class="input-group">
+                    <span class="input-group-text">R$</span>
+                    <input type="number" id="filterMinPrice" class="form-control" placeholder="Min">
+                    <input type="number" id="filterMaxPrice" class="form-control" placeholder="Max">
+                </div>
+            </div>
+            <div class="mb-4">
+                <label class="form-label fw-bold small text-uppercase">Estado do Item</label>
+                <select class="form-select" id="filterCondition">
+                    <option value="">Todos</option>
+                    <option value="novo">Novo</option>
+                    <option value="usado">Usado</option>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label class="form-label fw-bold small text-uppercase">Localização</label>
+                <input type="text" id="filterLocation" class="form-control" placeholder="Ex: São Paulo">
+            </div>
+            <button class="btn btn-primary w-100 mb-2" onclick="renderGrid()" data-bs-dismiss="offcanvas">Aplicar Filtros</button>
+            <button class="btn btn-link text-muted w-100 text-decoration-none" onclick="limparFiltros()" data-bs-dismiss="offcanvas">Limpar</button>
+        </div>
+    </div>
+
+    <div class="modal fade" id="detalhesModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content border-0 overflow-hidden" style="border-radius: 24px;">
+                <div class="modal-body p-0 position-relative">
+
+                    <button class="modal-nav-btn modal-nav-prev" onclick="navigateModal(-1)">
+                        <span class="material-symbols-rounded">arrow_back_ios_new</span>
+                    </button>
+                    <button class="modal-nav-btn modal-nav-next" onclick="navigateModal(1)">
+                        <span class="material-symbols-rounded">arrow_forward_ios</span>
+                    </button>
+
+                    <button type="button" class="btn-close position-absolute top-0 end-0 m-3 z-3 bg-white p-2 rounded-circle shadow-sm" data-bs-dismiss="modal"></button>
+                    <div class="row g-0" style="min-height: 550px;">
+                        <div class="col-lg-7 bg-black d-flex align-items-center justify-content-center position-relative">
+                            <div id="carouselDetalhes" class="carousel slide w-100 h-100" data-bs-interval="false">
+                                <div class="carousel-inner h-100" id="detalhesSlides"></div>
+                                <button class="carousel-control-prev" type="button" data-bs-target="#carouselDetalhes" data-bs-slide="prev">
+                                    <span class="carousel-control-prev-icon"></span>
+                                </button>
+                                <button class="carousel-control-next" type="button" data-bs-target="#carouselDetalhes" data-bs-slide="next">
+                                    <span class="carousel-control-next-icon"></span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-lg-5 bg-white p-5 d-flex flex-column">
+                            <div class="mb-auto">
+                                <div class="badge bg-light text-dark border mb-2" id="modalCatBadge">Categoria</div>
+                                <h2 class="fw-bold mb-2" id="modalTitle">Título</h2>
+                                <h3 class="text-primary fw-bold mb-4" id="modalPrice">R$ 0,00</h3>
+
+                                <div class="d-flex align-items-center gap-3 mb-4">
+                                    <div class="d-flex align-items-center gap-2 text-muted small">
+                                        <span class="material-symbols-rounded">location_on</span>
+                                        <span id="modalLocation">Local</span>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-2 text-muted small">
+                                        <span class="material-symbols-rounded">schedule</span>
+                                        <span id="modalDate">Data</span>
+                                    </div>
+                                </div>
+
+                                <p class="text-muted mb-4" id="modalDesc">Descrição...</p>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-primary btn-lg py-3 rounded-pill shadow-sm" id="btnModalNegociar">
+                                    Iniciar Negociação
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
